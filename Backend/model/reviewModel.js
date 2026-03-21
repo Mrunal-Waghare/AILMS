@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { comment } from "postcss";
 
 const reviewSchema = new mongoose.Schema({
     course:{
