@@ -1,5 +1,5 @@
 import React, { use } from 'react'
-import Nav from '../component/nav'
+import Nav from '../component/Nav'
 import home from "../assets/home1.jpg"
 import { SiViaplay } from "react-icons/si";
 import ai from "../assets/ai.png";
