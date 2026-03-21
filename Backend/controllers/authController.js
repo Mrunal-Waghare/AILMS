@@ -39,8 +39,8 @@ export const signup = async (req, res) => {
     // ✅ FIXED COOKIE SETTINGS
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,        // keep false for localhost
-      sameSite: "Lax",      // 🔥 IMPORTANT FIX (was Strict)
+      secure: true,        // keep false for localhost
+      sameSite: "none",      // 🔥 IMPORTANT FIX (was Strict)
       //maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
@@ -73,8 +73,8 @@ export const login = async (req, res) => {
     // ✅ FIXED COOKIE SETTINGS
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,
-      sameSite: "Lax",   // 🔥 IMPORTANT FIX
+      secure: true,
+      sameSite: "none",   //  IMPORTANT FIX
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
@@ -205,8 +205,8 @@ export const googleAuth = async (req, res) => {
     // ✅ FIXED COOKIE SETTINGS
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,
-      sameSite: "Lax",   // 🔥 IMPORTANT FIX
+      secure: true,
+      sameSite: "none",   //  IMPORTANT FIX
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
