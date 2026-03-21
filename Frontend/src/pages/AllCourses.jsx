@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { FaArrowLeft } from "react-icons/fa6";
-import Nav from '../component/nav';
+import Nav from '../component/Nav';
 import { useNavigate } from 'react-router-dom';
-import ai from "../assets/SearchAI.png"
+import ai from "../assets/SearchAi.png";
 import { useSelector } from 'react-redux';
 import Card from '../component/Card';
 
