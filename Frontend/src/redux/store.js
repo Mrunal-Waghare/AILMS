@@ -1,15 +1,14 @@
-import {configureStore} from '@reduxjs/toolkit'
+import { configureStore } from '@reduxjs/toolkit'
 import userSlice from "./userSlice"
 import courseSlice from "./courseSlice"
-import lectureSlice from "./lectureSlice"
+import lectureReducer from "./lectureSlice"
 import reviewSlice from './reviewSlice'
-
 
 export const store = configureStore({
     reducer:{
-        user:userSlice,
-        course:courseSlice,
-        Lecture:lectureSlice,
-        review:reviewSlice
+        user: userSlice,
+        course: courseSlice,
+        lecture: lectureReducer, 
+        review: reviewSlice
     }
 })

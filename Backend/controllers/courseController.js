@@ -120,26 +120,38 @@ export const removeCourse = async (req, res) => {
 
 
 // for lectures
-export const createLecture = async(req, res)=>{
-    try{
-        const {lectureTitle} = req.body
-        const {courseId} = req.params
-        if(!lectureTitle || !courseId){
-            return res.status(400).json({message:"lectureTitle is required"})
-        }
-        const lecture = await Lecture.create({courseTitle})
-        const course = await Course.findById(courseId)
-        if(course){
-            course.lectures.push(lecture._id)
-        }
-        await course.populate("lectures")
-        await course.save()
-        return res.status(201).json({lecture, course})
+export const createLecture = async (req, res) => {
+    try {
+        const { lectureTitle } = req.body;
+        const { courseId } = req.params;
 
-    } catch(error){
-        return res.status(500).json({message: "failed to create lecture", error});
+        if (!lectureTitle || !courseId) {
+            return res.status(400).json({ message: "lectureTitle and courseId are required" });
+        }
+
+        const course = await Course.findById(courseId);
+
+        if (!course) {
+            return res.status(404).json({ message: "Course not found" });
+        }
+
+        const lecture = await Lecture.create({
+            lectureTitle,
+            course: courseId   // ✅ FIXED
+        });
+
+        course.lectures.push(lecture._id);
+
+        await course.save();
+        await course.populate("lectures");
+
+        return res.status(201).json({ lecture, course });
+
+    } catch (error) {
+        console.log(error); // 🔥 VERY IMPORTANT
+        return res.status(500).json({ message: "failed to create lecture", error: error.message });
     }
-}
+};
 
 export const getCourseLecture = async(req, res)=>{
     try{
@@ -182,7 +194,6 @@ export const editLecture = async (req, res)=>{
         return res.status(404).json({message:`failed to edit lectures ${error}`})
     }
 }
-
 
 export const removeLecture = async(req, res)=>{
     try{

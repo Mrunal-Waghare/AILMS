@@ -21,18 +21,21 @@ function EditLecture() {
   );
   const [videoUrl, setVideoUrl] = useState(null);
   const [isPreviewFree, setIsPreviewFree] = useState(false);
-  const [loading, setLoading] = useState(false);
+
+  const [loading, setLoading] = useState(false);     // for update
+  const [loading1, setLoading1] = useState(false);   // ✅ FIXED (for delete)
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // ================= UPDATE LECTURE =================
   const handleEditLecture = async () => {
     setLoading(true);
 
     try {
       const formdata = new FormData();
       formdata.append("lectureTitle", lectureTitle);
-      formdata.append("video", videoUrl);
+      formdata.append("videoUrl", videoUrl);   // ✅ FIXED (must match backend)
       formdata.append("isPreviewFree", isPreviewFree);
 
       const result = await axios.post(
@@ -41,9 +44,10 @@ function EditLecture() {
         { withCredentials: true }
       );
 
-      dispatch(setLectureData(result.data.lectures));
+      navigate(`/createlecture/${courseId}`);
       toast.success("Lecture Updated");
       navigate(`/createlecture/${courseId}`);
+
     } catch (error) {
       console.log(error);
       toast.error(error.response?.data?.message || "Something went wrong");
@@ -52,21 +56,24 @@ function EditLecture() {
     }
   };
 
+  // ================= REMOVE LECTURE =================
   const removeLecture = async () => {
     setLoading1(true);
     try {
       const result = await axios.delete(
-        `${serverUrl}/api/course/deletelecture/${lectureId}`,
-        { withCredentials: true });
-      console.log(result.data)
-      setLoading1(false);
-      navigate(`/createlecture/${courseId}`);
+        `${serverUrl}/api/course/removelecture/${lectureId}`,  // ✅ FIXED route
+        { withCredentials: true }
+      );
+
+      console.log(result.data);
       toast.success("Lecture Removed");
+      navigate(`/createlecture/${courseId}`);
 
     } catch (error) {
-      setLoading1(false);
       console.log(error);
       toast.error(error.response?.data?.message || "Something went wrong");
+    } finally {
+      setLoading1(false);
     }
   };
 
@@ -85,11 +92,17 @@ function EditLecture() {
           </h2>
         </div>
 
-        <button className='mt-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition text-sm' disabled={loading1} onClick={removeLecture}>
-          {loading1 ?  <ClipLoader size={30} color='white' />:"Remove Lecture"}
+        {/* DELETE BUTTON */}
+        <button
+          className='mt-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition text-sm'
+          disabled={loading1}
+          onClick={removeLecture}
+        >
+          {loading1 ? <ClipLoader size={30} color='white' /> : "Remove Lecture"}
         </button>
 
         <div className='space-y-4'>
+
           {/* Lecture Title */}
           <div>
             <label className='block text-sm font-medium text-gray-700 mb-1'>
@@ -115,7 +128,6 @@ function EditLecture() {
               className='w-full border border-gray-300 rounded-md p-2
               file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0
               file:text-sm file:bg-gray-700 file:text-white hover:file:bg-gray-500'
-              required
               accept="video/*"
               onChange={(e) => setVideoUrl(e.target.files[0])}
             />
