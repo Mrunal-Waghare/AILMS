@@ -56,32 +56,51 @@ export const editCourse = async (req, res) => {
     const { title, subTitle, description, category, level, price, isPublished } = req.body;
 
     let thumbnail;
+
+    // ✅ HANDLE FILE SAFELY (Render fix)
     if (req.file) {
-      thumbnail = await uploadOnCloudinary(req.file.path);
+      console.log("FILE:", req.file); // 🔥 Debug log
+
+      const filePath = req.file.path || req.file.buffer; // works for both cases
+      thumbnail = await uploadOnCloudinary(filePath);
     }
 
+    // ✅ CHECK COURSE
     let course = await Course.findById(courseId);
     if (!course) {
       return res.status(404).json({ message: "Course not found" });
     }
 
-    const updateData = {
-      title,
-      subTitle,
-      description,
-      category,
-      level,
-      price,
-      isPublished
-    };
+    // ✅ SAFE UPDATE OBJECT (avoid undefined issues)
+    const updateData = {};
 
+    if (title) updateData.title = title;
+    if (subTitle) updateData.subTitle = subTitle;
+    if (description) updateData.description = description;
+    if (category) updateData.category = category;
+    if (level) updateData.level = level;
+    if (price) updateData.price = price;
+    if (isPublished !== undefined) updateData.isPublished = isPublished;
     if (thumbnail) updateData.thumbnail = thumbnail;
 
-    course = await Course.findByIdAndUpdate(courseId, updateData, { new: true });
+    // ✅ UPDATE COURSE
+    course = await Course.findByIdAndUpdate(courseId, updateData, {
+      new: true,
+    });
 
-    return res.status(200).json({ message: "Course updated successfully", course });
+    return res.status(200).json({
+      message: "Course updated successfully",
+      course,
+    });
+
   } catch (error) {
-    return res.status(500).json({ message: "Error updating course", error });
+    // 🔥 VERY IMPORTANT DEBUG
+    console.log("EDIT COURSE ERROR:", error);
+
+    return res.status(500).json({
+      message: "Error updating course",
+      error: error.message,
+    });
   }
 };
 
