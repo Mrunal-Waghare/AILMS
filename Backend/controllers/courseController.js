@@ -188,31 +188,48 @@ export const getCourseLecture = async(req, res)=>{
 }
 
 
-export const editLecture = async (req, res)=>{
-    try{
-        const {lectureId} = req.params
-        const {isPreviewFree, lectureTitle} = req.body
-        const lecture = await Lecture.findById(lectureId)
-        if(!lecture){
-            returnres.status(404).json({message:"Lecture is not found"})
-        }
-        let videoUrl
-        if(req.file){
-            videoUrl = await uploadOnCloudinary(req.file.path)
-            lecture.videoUrl = videoUrl
-        }
-        if(lectureTitle){
-            lecture.lectureTitle= lectureTitle
-        }
-        lecture.isPreviewFree = isPreviewFree
+export const editLecture = async (req, res) => {
+    try {
+        const { lectureId } = req.params;
+        const { isPreviewFree, lectureTitle } = req.body;
 
-        await lecture.save()
-        return res.status(200).json(lecture)
+        const lecture = await Lecture.findById(lectureId);
 
-    } catch(error){
-        return res.status(404).json({message:`failed to edit lectures ${error}`})
+        if (!lecture) {
+            return res.status(404).json({ message: "Lecture is not found" });
+        }
+
+        // upload video safely
+        if (req.file) {
+            const filePath = req.file.path || req.file.buffer;
+            const videoUrl = await uploadOnCloudinary(filePath);
+            lecture.videoUrl = videoUrl;
+        }
+
+        if (lectureTitle) {
+            lecture.lectureTitle = lectureTitle;
+        }
+
+        if (isPreviewFree !== undefined) {
+            lecture.isPreviewFree = isPreviewFree;
+        }
+
+        await lecture.save();
+
+        return res.status(200).json({
+            message: "Lecture updated successfully",
+            lecture
+        });
+
+    } catch (error) {
+        console.log("EDIT LECTURE ERROR:", error);
+
+        return res.status(500).json({
+            message: "Failed to edit lecture",
+            error: error.message
+        });
     }
-}
+};
 
 export const removeLecture = async(req, res)=>{
     try{
