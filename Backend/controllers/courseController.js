@@ -195,10 +195,9 @@ export const editLecture = async (req, res) => {
 
         const lecture = await Lecture.findById(lectureId);
 
-        if (!lecture) {
-            return res.status(404).json({ message: "Lecture is not found" });
+       if (!lecture) {
+        return res.status(404).json({ message: "Lecture is not found" });
         }
-
         // upload video safely
         if (req.file) {
             const filePath = req.file.path || req.file.buffer;
