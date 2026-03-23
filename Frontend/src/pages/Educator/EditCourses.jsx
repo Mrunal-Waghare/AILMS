@@ -66,44 +66,57 @@ function EditCourses() {
     getCourseById()
   }, [])
 
-  const handleEditCourse = async()=>{
-    setLoading(true)
-    const formData = new FormData()
-    formData.append("title", title)
-    formData.append("subtitle", subTitle)
-    formData.append("category", category)
-    formData.append("level", level)
-    formData.append("price", price)
-    formData.append("thumbnail", backendImage)
-    formData.append("isPublished", isPublished)
-    try{
-      const result = await axios.post(serverUrl + `/api/course/editcourse/${courseId}`, formData, {withCredentials:true})
-      console.log(result.data)
+const handleEditCourse = async () => {
+  setLoading(true)
 
-      const updateData = result.data
-      if(updateData.isPublished){
-        const updateCuorses = courseData.map(c => c._id == courseId ? updateData : c)
+  const formData = new FormData()
+  formData.append("title", title)
+  formData.append("subTitle", subTitle) // ✅ FIXED
+  formData.append("category", category)
+  formData.append("level", level)
+  formData.append("price", price)
+  formData.append("isPublished", isPublished)
 
-      if(!courseData.some(c=> c._id === courseId))
-      {
-        updateCuorses.push(updateData)
-      }
-      dispatch(setCourseData(updateCuorses))
-      }
-      else{
-        const filterCourses = courseData.filter(c => c._id !==courseId)
-        dispatch(setCourseData(filterCourses))
-      }
-      setLoading(false)
-      navigate("/courses")
-      toast.success("course Updated")
-
-    } catch(error){
-      console.log(error)
-      setLoading(false)
-      toast.error(error.response.data.message)
-    }
+  if (backendImage) {
+    formData.append("thumbnail", backendImage) // ✅ SAFE
   }
+
+  try {
+    const result = await axios.post(
+      `${serverUrl}/api/course/editcourse/${courseId}`,
+      formData,
+      { withCredentials: true }
+    )
+
+    console.log(result.data)
+
+    const updateData = result.data.course // ✅ FIXED
+
+    if (updateData.isPublished) {
+      const updatedCourses = courseData.map(c =>
+        c._id === courseId ? updateData : c
+      )
+
+      if (!courseData.some(c => c._id === courseId)) {
+        updatedCourses.push(updateData)
+      }
+
+      dispatch(setCourseData(updatedCourses))
+    } else {
+      const filterCourses = courseData.filter(c => c._id !== courseId)
+      dispatch(setCourseData(filterCourses))
+    }
+
+    setLoading(false)
+    navigate("/courses")
+    toast.success("Course Updated")
+
+  } catch (error) {
+    console.log(error)
+    setLoading(false)
+    toast.error(error.response?.data?.message || "Something went wrong") // ✅ FIXED
+  }
+}
 
   const handleRemoveCourse = async()=>{
     setLoading1(true)
